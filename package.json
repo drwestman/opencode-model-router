@@ -7,7 +7,7 @@
   "main": "./index.cjs",
   "exports": {
     ".": {
-      "import": "./packages/opencode/src/index.js",
+      "import": "./index.js",
       "require": "./index.cjs",
       "default": "./index.cjs"
     }
@@ -43,6 +43,7 @@
   ],
   "files": [
     "index.cjs",
+    "index.js",
     "packages/opencode/package.json",
     "packages/opencode/tiers.json",
     "packages/opencode/src/generated/build-info.json",
