@@ -12,6 +12,7 @@ const allowedFiles = [
   "LICENSE",
   "README.md",
   "index.cjs",
+  "index.js",
   "package.json",
   "packages/opencode/README.md",
   "packages/opencode/package.json",
@@ -39,6 +40,25 @@ const runNpm = (args, env = process.env) =>
   });
 
 try {
+  const repoLocalShimPath = join(rootDir, ".opencode", "plugins", "model-router.js");
+  const repoLocalShimSource = readFileSync(repoLocalShimPath, "utf8");
+  assert.match(repoLocalShimSource, /import\("\.\.\/\.\.\/index\.cjs"\)/);
+  assert.doesNotMatch(repoLocalShimSource, /packages\/opencode\/src\/index\.js/);
+
+  const repoLocalPluginModule = await import(pathToFileURL(repoLocalShimPath).href);
+  assert.equal(
+    typeof repoLocalPluginModule.default,
+    "function",
+    "repo-local OpenCode shim must default export a plugin",
+  );
+
+  const rootPackageJson = JSON.parse(readFileSync(join(rootDir, "package.json"), "utf8"));
+  assert.deepEqual(rootPackageJson.exports?.["."], {
+    import: "./index.js",
+    require: "./index.cjs",
+    default: "./index.cjs",
+  });
+
   const output = runNpm(["--cache", cacheDir, "pack", "--dry-run", "--json"]);
   const manifest = JSON.parse(output);
   assert.ok(Array.isArray(manifest) && manifest.length > 0, "npm pack returned no manifest");

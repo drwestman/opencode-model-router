@@ -1,5 +1,5 @@
 export const ModelRouterPlugin = async (ctx) => {
-  const pluginModule = await import("../../packages/opencode/src/index.js");
+  const pluginModule = await import("../../index.cjs");
   return pluginModule.default(ctx);
 };
 export default ModelRouterPlugin;
